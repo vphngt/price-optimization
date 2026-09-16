@@ -14,7 +14,7 @@
 
   
 ## Key Features
-* Avoided biased imputation.
+* Recovered data coverage gaps without biased imputation.
 * Engineered rolling team statistics and dynamic Elo ratings.
 * Prevented data leakage with chronological train/test splits and `TimeSeriesSplit` cross-validation.
 * Precision-recall decision boundaries are optimized.
