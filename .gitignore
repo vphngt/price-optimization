@@ -6,3 +6,5 @@ env/
 *.joblib
 *.pkl
 .ipynb_checkpoints/
+*.csv
+.DS_Store
