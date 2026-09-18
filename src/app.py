@@ -11,21 +11,14 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-# ---------------------------------------------------------
-# 1. INITIALIZE WEB PAGE SETTINGS
-# ---------------------------------------------------------
+# ----- WEB PAGE SETTINGS -----
 st.set_page_config(page_title="Retail Price Optimizer", layout="centered")
-st.title("🎯 Algorithmic Price Optimization Dashboard")
+st.title("Algorithmic Price Optimization Dashboard")
 st.markdown(
     "Powered by PostgreSQL & Random Forest Predictive Demand Modeling"
 )
 
-
-# ---------------------------------------------------------
-# 2. SECURELY LOAD DATA FROM POSTGRESQL (CACHED FOR SPEED)
-# ---------------------------------------------------------
-
-
+# cached data from SQL for speed
 @st.cache_resource
 def load_optimized_assets():
     current_dir = Path(__file__).resolve().parent
@@ -51,20 +44,17 @@ def load_optimized_assets():
 
     return df_clean, demand_model
 
-# 🚀 THE FIX: Assign BOTH variables returned by your function!
 try:
     df, demand_model = load_optimized_assets()
-    st.success("🔒 Securely connected to PostgreSQL. Pre-trained ML Model loaded!")
+    st.success("Securely connected to PostgreSQL. Pre-trained ML Model loaded!")
 except Exception as e:
-    st.error(f"⚠️ App Configuration Failure: {e}")
+    st.error(f"App Configuration Failure: {e}")
     st.stop()
 
 
 
-# ---------------------------------------------------------
-# 3. INTERACTIVE FRONTEND UI
-# ---------------------------------------------------------
-st.header("⚡ Simulate Pricing Strategies")
+# ----- FRONTEND UI -----
+st.header("Simulate Pricing Strategies")
 
 # Dropdown for user-defined product category selection
 selected_cat = st.selectbox("Select Product Category", df["category"].unique())
@@ -81,9 +71,7 @@ col1.metric("Historical Avg Price", f"${current_avg:.2f}")
 col2.metric("Market Price Range", f"${min_price:.2f} - ${max_price:.2f}")
 
 
-# ---------------------------------------------------------
-# 4. OPTIMIZATION SIMULATOR SUB-ROUTINE
-# ---------------------------------------------------------
+# optimization
 def run_optimization(promo_name, stockout_status, margin_pct=0.40):
     estimated_cost = current_avg * (1 - margin_pct)
     # Generate bounded test grid (+/- 20% around average)
@@ -108,7 +96,7 @@ def run_optimization(promo_name, stockout_status, margin_pct=0.40):
 
 
 # Action Button to compute optimal configurations
-if st.button("🚀 Compute Optimal Prices"):
+if st.button("Compute Optimal Prices"):
     with st.spinner("Running algorithmic grid search..."):
         # Scenario A: Standard Pricing (No promo, in stock)
         available_promos = cat_df["promotion_type"].unique()
@@ -124,11 +112,11 @@ if st.button("🚀 Compute Optimal Prices"):
         optimal_promo = run_optimization(target_promo, stockout_status=0)
 
     # Output Results Matrix to UI
-    st.subheader("🎯 Optimization Matrix Recommendations")
+    st.subheader("Optimization Matrix Recommendations")
     res_col1, res_col2 = st.columns(2)
     res_col1.metric("Recommended Regular Price", f"${optimal_reg:.2f}")
     res_col2.metric("Recommended Promo Price", f"${optimal_promo:.2f}")
 
     st.info(
-        "💡 **Operational Rule Applied:** Out-of-Stock configurations (`stockout_flag=1`) have been hard-coded to **$0.00** discounts to preserve margins based on historical leakage analysis."
+        "**Operational Rule Applied:** Out-of-Stock configurations (`stockout_flag=1`) have been hard-coded to **$0.00** discounts to preserve margins based on historical leakage analysis."
     )
