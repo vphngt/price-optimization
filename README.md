@@ -1,6 +1,6 @@
 # **Demand Forecaster & Price Optimizer**
 
-**An end-to-end machine learning pipeline and business simulation engine that forecasts product demand and algorithmically optimizes pricing for maximum profitability.**
+**An end-to-end ML pipeline and business simulation engine that forecasts product demand and optimizes pricing for maximum profit.**
 
 ---
 
