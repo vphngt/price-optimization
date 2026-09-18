@@ -71,7 +71,7 @@ def run_pipeline(df):
         X, y, test_size=0.2, random_state=42
     )
     print(
-        f"Dataset split: {len(X_train):,} training rows | {len(X_test):,} validation rows."
+        f"Dataset split: {len(X_train):,} training rows & {len(X_test):,} testing rows."
     )
 
 
@@ -115,7 +115,7 @@ def run_pipeline(df):
 
     # extract the best model
     demand_model = grid_search.best_estimator_
-    print(f"Grid Search complete! Optimal Parameters: {grid_search.best_params_}")
+    print(f"Grid Search complete!\n Optimal Parameters: {grid_search.best_params_}")
 
 
     # ----- METRICS EVALUATION -----
@@ -130,9 +130,7 @@ def run_pipeline(df):
     # error reduction formula
     error_reduction_pct = ((baseline_mae - ml_mae) / baseline_mae) * 100
 
-    print("----------------------------------------------------")
-    print("PERFORMANCE METRICS REPORT")
-    print("----------------------------------------------------")
+    print("----- PERFORMANCE METRICS REPORT -----")
     print(f"Historical Baseline Average MAE: {baseline_mae:.2f} units")
     print(f"Hyper-Tuned Random Forest MAE:   {ml_mae:.2f} units")
     print("----------------------------------------------------")
@@ -146,7 +144,7 @@ def price_optimization(clean_df, demand_model):
     optimization_records = []
     categories = clean_df["category"].unique()
 
-    print("Simulating algorithmic grid search price points...")
+    print("Simulating algorithmic grid search price points...\n")
     for cat in categories:
         cat_df = clean_df[clean_df["category"] == cat]
         current_avg = cat_df["current_price"].mean()
@@ -178,9 +176,7 @@ def price_optimization(clean_df, demand_model):
         )
 
     optimized_price_grid = pd.DataFrame(optimization_records)
-    print("\n--------------------------------------------------")
-    print("PRICING GRID RESULT")
-    print("----------------------------------------------------")
+    print("----- PRICING GRID RESULT -----")
     return optimized_price_grid
 
 
