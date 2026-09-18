@@ -1,11 +1,11 @@
-# **E-Commerce Demand Forecaster & Price Optimizer**
+# **Demand Forecaster & Price Optimizer**
 
 **An end-to-end machine learning pipeline and business simulation engine that forecasts product demand and algorithmically optimizes pricing for maximum profitability.**
 
 ---
 
 ## Data Source
-* **[Kaggle](https://kaggle.com)**: Processed over **170,000 transaction records** capturing granular retail vectors including historical volume metrics, active category layers, cross-channel promotional distributions, and real-time inventory stockout events.
+* **[Kaggle](https://www.kaggle.com/datasets/noopurbhatt/retail-pricing-and-demand-signals-dataset/data?select=retail_pricing_demand_100k.csv)**: Processed over **170,000 transaction records** capturing granular retail vectors including historical volume metrics, active category layers, cross-channel promotional distributions, and real-time inventory stockout events.
 
 
 ## Technologies Used
