@@ -1,21 +1,17 @@
 import os
 from pathlib import Path
 import joblib
-from pathlib import Path
 import numpy as np
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
-from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sqlalchemy import create_engine
 
 # ----- WEB PAGE SETTINGS -----
 st.set_page_config(page_title="Retail Price Optimizer", layout="centered")
 st.title("Algorithmic Price Optimization Dashboard")
 st.markdown(
-    "Powered by PostgreSQL & Random Forest Predictive Demand Modeling"
+    "Powered by PostgreSQL & XGBoost Predictive Demand Modeling"
 )
 
 # cached data from SQL for speed
@@ -25,21 +21,21 @@ def load_optimized_assets():
     root_dir = current_dir.parent
     env_path = root_dir / ".env"
 
+    # Update path to use your final XGBoost model artifact
     model_path = current_dir / "demand_model.joblib"
 
     load_dotenv(dotenv_path=env_path, override=True)
     db_password = os.getenv("DB_PASSWORD")
 
-    from sqlalchemy import create_engine
-
     engine = create_engine(
         f"postgresql://postgres:{db_password}@localhost:5432/postgres"
     )
 
-    sql_query = "SELECT category, current_price, promotion_type FROM retail_sales;"
+    # FIX: Added 'stockout_flag' so the ML model has all its required training features
+    sql_query = "SELECT * FROM optimized_sales_features;"
     df_clean = pd.read_sql(sql_query, con=engine)
 
-    # 2. FAST INFUSION: Load via joblib for superior memory mapping performance
+    # Load via joblib for superior memory mapping performance
     demand_model = joblib.load(model_path)
 
     return df_clean, demand_model
@@ -50,7 +46,6 @@ try:
 except Exception as e:
     st.error(f"App Configuration Failure: {e}")
     st.stop()
-
 
 
 # ----- FRONTEND UI -----
@@ -86,7 +81,12 @@ def run_optimization(promo_name, stockout_status, margin_pct=0.40):
         }
     )
 
-    sim_grid["predicted_units"] = demand_model.predict(sim_grid).clip(lower=0)
+    # Reorder columns exactly how the model pipeline saw them during training
+    feature_order = ["current_price", "category", "promotion_type", "stockout_flag"]
+    sim_grid = sim_grid[feature_order]
+
+    sim_grid["predicted_units"] = demand_model.predict(sim_grid)
+    sim_grid["predicted_units"] = sim_grid["predicted_units"].clip(lower=0)
     sim_grid["projected_profit"] = sim_grid["predicted_units"] * (
         sim_grid["current_price"] - estimated_cost
     )
@@ -118,5 +118,5 @@ if st.button("Compute Optimal Prices"):
     res_col2.metric("Recommended Promo Price", f"${optimal_promo:.2f}")
 
     st.info(
-        "**Operational Rule Applied:** Out-of-Stock configurations (`stockout_flag=1`) have been hard-coded to **$0.00** discounts to preserve margins based on historical leakage analysis."
+        "**Operational Rule Applied:** Out-of-Stock configurations (`stockout_flag=1`) have been hard-coded to **\$0.00** discounts to preserve margins based on historical leakage analysis."
     )
