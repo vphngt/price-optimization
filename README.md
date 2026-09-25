@@ -22,7 +22,7 @@
 
 
 ## Results
-* Significantly reduced overall predictive error (MAE) compared to historical averages by 58%.
+* Significantly reduced MAE by 58% compared to historical averages.
 * Produced an actionable master grid showing current average prices versus optimal profit-maximizing prices.
 
 
